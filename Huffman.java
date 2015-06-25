@@ -1,7 +1,10 @@
-import Tree.Leaf;
-import Tree.Node;
-import Tree.NotLeaf;
+package ir.amfad;
 
+import ir.amfad.Tree.Leaf;
+import ir.amfad.Tree.Node;
+import ir.amfad.Tree.NotLeaf;
+
+import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.PriorityQueue;
@@ -10,7 +13,16 @@ import java.util.PriorityQueue;
  * Created by amfad33 on 6/13/2015.
  */
 public class Huffman {
-    public static Node build(Map map) {
+    private Map codes;
+
+    public Huffman(Map map){
+        Node n = build(map);
+        System.out.println("Notification : Tree Successfully built ...");
+        codes = new HashMap();
+        compute(n);
+        System.out.println("Notification : Computing codes successfully done ...");
+    }
+    private Node build(Map map) {
         PriorityQueue<Node> trees = new PriorityQueue<Node>();
 
         Iterator i = map.entrySet().iterator();
@@ -34,12 +46,14 @@ public class Huffman {
         return trees.poll();
     }
 
-    public static void compute(Node tree) {
+    private void compute(Node tree) {
         assert tree != null;
+
         if (tree instanceof Leaf) {   //the tree has only one character
             Leaf leaf = (Leaf)tree;
             // print out character, frequency, and code for this leaf (which is just the prefix)
             System.out.println(leaf.value + "\t" + leaf.frequency + "\t" + leaf.code);
+            codes.put(leaf.value,leaf.code);
 
         } else if (tree instanceof NotLeaf) {
             NotLeaf node = (NotLeaf)tree;
@@ -52,5 +66,17 @@ public class Huffman {
             node.right.code=node.code+"1";
             compute(node.right);
         }
+    }
+
+    public String encode(String sent){
+        String res ="";
+        for(int i=0;i<sent.length();i++) {
+            char c = sent.charAt(i);
+            if(codes.containsKey(""+c))
+                res+=codes.get(""+c);
+            else
+                res+=c;
+        }
+        return res;
     }
 }
